@@ -1,0 +1,65 @@
+import { Bell, Calendar, CheckCircle2, Droplets, Dumbbell, Salad } from "lucide-react";
+import { MobileAppShell } from "@/components/layout/MobileAppShell";
+import { Card } from "@/components/ui/Card";
+import { StatePreview } from "@/components/patient-mobile/StatePreview";
+import { resolveUiState } from "@/data/mock/ui-states";
+import { LoadingState } from "@/components/ui/LoadingState";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ErrorState } from "@/components/ui/ErrorState";
+import { ForbiddenState } from "@/components/ui/ForbiddenState";
+
+export default async function MobilePatientDashboardPage({ searchParams }: { searchParams?: Promise<{ state?: string }> }) {
+  const state = resolveUiState((await searchParams)?.state);
+  if (state === "loading") return <MobileAppShell active="Início"><LoadingState title="Carregando app do paciente" /></MobileAppShell>;
+  if (state === "empty") return <MobileAppShell active="Início"><EmptyState title="Sem dados do app" description="Ainda não existem registros para seu painel inicial." /></MobileAppShell>;
+  if (state === "error") return <MobileAppShell active="Início"><ErrorState title="Falha ao carregar app do paciente" /></MobileAppShell>;
+  if (state === "forbidden") return <MobileAppShell active="Início"><ForbiddenState title="Acesso restrito ao app do paciente" /></MobileAppShell>;
+  const actions = [
+    { icon: Droplets, label: "Água", value: "1,8L" },
+    { icon: Salad, label: "Refeições", value: "3 de 5" },
+    { icon: Dumbbell, label: "Treino", value: "35 min" },
+    { icon: CheckCircle2, label: "Check-in", value: "Semanal" },
+  ];
+
+  return (
+    <MobileAppShell active="Início">
+      <header className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">Paciente</p>
+          <h1 className="text-2xl font-semibold">Olá, Juliana 👋</h1>
+        </div>
+        <Bell className="h-5 w-5 text-muted-foreground" />
+      </header>
+
+      <Card className="rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 p-5 text-white">
+        <p className="text-sm">Seu progresso é construído com consistência e acompanhamento profissional.</p>
+        <div className="mt-3 flex items-end justify-between">
+          <p className="text-3xl font-semibold">72%</p>
+          <p className="text-sm">Semana 8 de 12</p>
+        </div>
+      </Card>
+
+      <section className="mt-4 grid grid-cols-2 gap-3">
+        {actions.map(({ icon: Icon, label, value }) => (
+          <Card key={label} className="rounded-2xl p-4">
+            <Icon className="h-5 w-5 text-emerald-700" />
+            <p className="mt-2 text-sm font-semibold">{label}</p>
+            <p className="text-xs text-muted-foreground">{value}</p>
+          </Card>
+        ))}
+      </section>
+
+      <Card className="mt-4 rounded-2xl p-4">
+        <div className="flex items-center gap-3">
+          <Calendar className="h-5 w-5 text-emerald-700" />
+          <div>
+            <p className="text-sm font-semibold">Próxima consulta</p>
+            <p className="text-xs text-muted-foreground">12 de maio de 2026 · 08:30</p>
+          </div>
+        </div>
+      </Card>
+
+      <StatePreview context="Dashboard paciente" />
+    </MobileAppShell>
+  );
+}
